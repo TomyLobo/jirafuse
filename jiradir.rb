@@ -3,6 +3,10 @@
 require './routeddir'
 require './jira'
 
+def to_json(object)
+    object.body
+end
+
 class JiraDir < RoutedDir
     def initialize
         @jira = Jira.new
@@ -26,12 +30,10 @@ class JiraDir < RoutedDir
     end
 
     def read_issue_comment_json(params)
-        # return the HTTP body
-        read_issue_comment(params).body
+        to_json(read_issue_comment(params))
     end
 
     def read_issue_comment_body(params)
-        # return the value for the "body" key in the JSON object in the HTTP body
         read_issue_comment(params)['body']
     end
 
