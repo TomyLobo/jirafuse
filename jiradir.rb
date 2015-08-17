@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'time'
 require './routeddir'
 require './jira'
 
@@ -35,6 +36,16 @@ class JiraDir < RoutedDir
 
     def read_issue_comment_body(params)
         read_issue_comment(params)['body']
+    end
+
+    def get_issue_comment_times(params)
+        comment = read_issue_comment(params)
+
+        ctime = Time.parse(comment['created']).to_i
+        mtime = Time.parse(comment['updated']).to_i
+        atime = mtime
+
+        return [ atime, mtime, ctime ]
     end
 
     def read_issue(params)
@@ -77,7 +88,9 @@ class JiraDir < RoutedDir
         route_add :list, '/projects/:project/issues/:issue', to: [ 'comments', 'attachments', 'title' ]
          route_add :list, '/projects/:project/issues/:issue/comments', to: :list_issue_comments
           route_add :read, '/projects/:project/issues/:issue/comments/:comment.txt', to: :read_issue_comment_body
+          route_add :times, '/projects/:project/issues/:issue/comments/:comment.txt', to: :get_issue_comment_times
           route_add :read, '/projects/:project/issues/:issue/comments/:comment.json', to: :read_issue_comment_json
+          route_add :times, '/projects/:project/issues/:issue/comments/:comment.json', to: :get_issue_comment_times
          route_add :list, '/projects/:project/issues/:issue/attachments', to: :list_issue_attachments
           route_add :read, '/projects/:project/issues/:issue/attachments/:attachment.json', to: :read_attachment_json
           route_add :list, '/projects/:project/issues/:issue/attachments/:attachment', to: :list_attachment_body, constraints: { attachment: /[^\/.]+/ }
