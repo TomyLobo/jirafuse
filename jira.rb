@@ -13,14 +13,17 @@ class Jira
     end
 
     def get(path, options = {})
-        return raw_get("/rest/api/2#{path}", options)
+        return raw_get("/rest/api/2#{path}", options.deep_merge({
+            headers: {
+                'Accept' => 'application/json',
+            }
+        }))
     end
 
     def raw_get(path, options = {})
         response = self.class.get(path, options.deep_merge({
             base_uri: @config['base_uri'],
             headers: {
-                'Accept' => 'application/json',
                 'X-Atlassian-Token' => 'nocheck',
             },
             basic_auth: {
