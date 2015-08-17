@@ -8,6 +8,10 @@ def to_json(object)
     "#{JSON.pretty_generate(object)}\n\n" # TODO: figure out why 2 characters are cut off the end
 end
 
+def to_timestamp(time_string)
+    Time.parse(time_string).to_i
+end
+
 class JiraDir < RoutedDir
     def initialize
         @jira = Jira.new
@@ -41,8 +45,8 @@ class JiraDir < RoutedDir
     def get_issue_comment_times(params)
         comment = read_issue_comment(params)
 
-        ctime = Time.parse(comment['created']).to_i
-        mtime = Time.parse(comment['updated']).to_i
+        ctime = to_timestamp(comment['created'])
+        mtime = to_timestamp(comment['updated'])
         atime = mtime
 
         return [ atime, mtime, ctime ]
@@ -81,7 +85,7 @@ class JiraDir < RoutedDir
     def get_issue_attachment_times(params)
         attachment = read_attachment(params)
 
-        ctime = Time.parse(attachment['created']).to_i
+        ctime = to_timestamp(attachment['created'])
         mtime = ctime
         atime = mtime
 
