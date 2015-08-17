@@ -2,6 +2,7 @@
 
 require 'rfusefs'
 require 'httparty'
+require 'pp'
 
 class Jira
     include HTTParty
@@ -11,7 +12,7 @@ class Jira
     end
 
     def get(path, options = {})
-        self.class.get(path, options.merge({
+        response = self.class.get(path, options.merge({
             base_uri: "#{@config['base_uri']}/rest/api/2",
             headers: {
                 'Accept' => 'application/json',
@@ -21,5 +22,16 @@ class Jira
                 password: @config['password'],
             },
         }))
+
+        return response if (200..299).include?(response.code)
+
+        puts 'Response:'
+        puts response.to_s
+        puts 'Options:'
+        pp(options)
+        puts "Response Code: #{response.code}"
+        puts "Path: #{path}"
+
+        raise 'hell'
     end
 end
