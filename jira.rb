@@ -16,6 +16,7 @@ class Jira
             base_uri: "#{@config['base_uri']}/rest/api/2",
             headers: {
                 'Accept' => 'application/json',
+                'X-Atlassian-Token' => 'nocheck',
             },
             basic_auth: {
                 username: @config['user'],
