@@ -17,11 +17,16 @@ module Routing
 
             # scan pattern for /:.../ (TODO: Regexp.escape the rest?)
             pattern = pattern.gsub /\/:([a-z0-9_]+)/ do
-                # store matches in order
-                @keys << $1.to_sym
+                sym = $1.to_sym
 
-                # replace by /([^/]*)
-                next '/([^/]*)'
+                # store matches in order
+                @keys << sym
+
+                # determine constraint
+                constraint = @hash[:constraints].to_h[sym] || /[^\/]*/
+
+                # replace by constraint
+                next /\/(#{constraint})/
             end
             @regex = /^#{pattern}$/
         end
