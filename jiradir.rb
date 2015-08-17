@@ -4,7 +4,7 @@ require './routeddir'
 require './jira'
 
 def to_json(object)
-    object.body
+    "#{JSON.pretty_generate(object)}\n\n" # TODO: figure out why 2 characters are cut off the end
 end
 
 class JiraDir < RoutedDir
