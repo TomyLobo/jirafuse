@@ -73,6 +73,16 @@ class JiraDir < RoutedDir
         @jira.raw_get(read_attachment(params)['content'])
     end
 
+    def get_issue_attachment_times(params)
+        attachment = read_attachment(params)
+
+        ctime = Time.parse(attachment['created']).to_i
+        mtime = ctime
+        atime = mtime
+
+        return [ atime, mtime, ctime ]
+    end
+
     def get_attachment_body_size(params)
         read_attachment(params)['size']
     end
@@ -93,8 +103,11 @@ class JiraDir < RoutedDir
           route_add :times, '/projects/:project/issues/:issue/comments/:comment.json', to: :get_issue_comment_times
          route_add :list, '/projects/:project/issues/:issue/attachments', to: :list_issue_attachments
           route_add :read, '/projects/:project/issues/:issue/attachments/:attachment.json', to: :read_attachment_json
+          route_add :times, '/projects/:project/issues/:issue/attachments/:attachment.json', to: :get_issue_attachment_times
           route_add :list, '/projects/:project/issues/:issue/attachments/:attachment', to: :list_attachment_body, constraints: { attachment: /[^\/.]+/ }
+          route_add :times, '/projects/:project/issues/:issue/attachments/:attachment', to: :get_issue_attachment_times, constraints: { attachment: /[^\/.]+/ }
            route_add :read, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :read_attachment_body
            route_add :size, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :get_attachment_body_size
+           route_add :times, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :get_issue_attachment_times
          route_add :read, '/projects/:project/issues/:issue/title', to: :read_issue_title
 end
