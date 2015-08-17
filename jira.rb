@@ -13,6 +13,9 @@ class Jira
     def get(path, options = {})
         self.class.get(path, options.merge({
             base_uri: "#{@config['base_uri']}/rest/api/2",
+            headers: {
+                'Accept' => 'application/json',
+            },
             basic_auth: {
                 username: @config['user'],
                 password: @config['password'],
