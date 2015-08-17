@@ -16,7 +16,7 @@ module Routing
             @keys = []
 
             # scan pattern for /:.../ (TODO: Regexp.escape the rest?)
-            pattern = pattern.gsub /\/:([^\/]+)/ do
+            pattern = pattern.gsub /\/:([a-z0-9_]+)/ do
                 # store matches in order
                 @keys << $1.to_sym
 

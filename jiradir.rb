@@ -17,7 +17,8 @@ class JiraDir < RoutedDir
     end
 
     def list_issue_comments(params)
-        @jira.get("/issue/#{params[:issue]}/comment")['comments'].map { |entry| entry['id'] }
+        comments = @jira.get("/issue/#{params[:issue]}/comment")['comments'].map { |entry| entry['id'] }
+        return comments.map { |id| id+'.txt' } + comments.map { |id| id+'.json' }
     end
 
     def read_issue_comment(params)
@@ -38,9 +39,8 @@ class JiraDir < RoutedDir
      route_add :list, '/projects', to: :list_projects
       route_add :list, '/projects/:project', to: [ 'issues' ]
        route_add :list, '/projects/:project/issues', to: :list_project_issues
-        route_add :list, '/projects/:project/issues/:issue', to: [ 'comments', 'comment_bodies' ]
+        route_add :list, '/projects/:project/issues/:issue', to: [ 'comments' ]
          route_add :list, '/projects/:project/issues/:issue/comments', to: :list_issue_comments
-          route_add :read, '/projects/:project/issues/:issue/comments/:comment', to: :read_issue_comment_json
-         route_add :list, '/projects/:project/issues/:issue/comment_bodies', to: :list_issue_comments
-          route_add :read, '/projects/:project/issues/:issue/comment_bodies/:comment', to: :read_issue_comment_body
+          route_add :read, '/projects/:project/issues/:issue/comments/:comment.txt', to: :read_issue_comment_body
+          route_add :read, '/projects/:project/issues/:issue/comments/:comment.json', to: :read_issue_comment_json
 end
