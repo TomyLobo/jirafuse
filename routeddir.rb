@@ -20,4 +20,8 @@ class RoutedDir
     def read_file(path)
         route_dispatch :read, path
     end
+
+    def size(path)
+        route_dispatch(:size, path) || read_file(path).length
+    end
 end
