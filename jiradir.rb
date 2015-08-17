@@ -37,12 +37,37 @@ class JiraDir < RoutedDir
         read_issue_comment(params)['body']
     end
 
+    def list_issue_attachments(params)
+        attachments = @jira.get("/issue/#{params[:issue]}?fields=attachment")['fields']['attachment'].map { |entry| entry['id'] }
+        return attachments + attachments.map { |id| id+'.json' }
+    end
+
+    def read_attachment(params)
+        @jira.get("/attachment/#{params[:attachment]}")
+    end
+
+    def read_attachment_json(params)
+        to_json(read_attachment(params))
+    end
+
+    def list_attachment_body(params)
+        [ read_attachment(params)['filename'] ]
+    end
+
+    def read_attachment_body(params)
+        @jira.raw_get(read_attachment(params)['content'])
+    end
+
     route_add :list, '/', to: [ 'projects' ]
      route_add :list, '/projects', to: :list_projects
       route_add :list, '/projects/:project', to: [ 'issues' ]
        route_add :list, '/projects/:project/issues', to: :list_project_issues
-        route_add :list, '/projects/:project/issues/:issue', to: [ 'comments' ]
+        route_add :list, '/projects/:project/issues/:issue', to: [ 'comments', 'attachments' ]
          route_add :list, '/projects/:project/issues/:issue/comments', to: :list_issue_comments
           route_add :read, '/projects/:project/issues/:issue/comments/:comment.txt', to: :read_issue_comment_body
           route_add :read, '/projects/:project/issues/:issue/comments/:comment.json', to: :read_issue_comment_json
+         route_add :list, '/projects/:project/issues/:issue/attachments', to: :list_issue_attachments
+          route_add :read, '/projects/:project/issues/:issue/attachments/:attachment.json', to: :read_attachment_json
+          route_add :list, '/projects/:project/issues/:issue/attachments/:attachment', to: :list_attachment_body, constraints: { attachment: /[^\/.]+/ }
+           route_add :read, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :read_attachment_body
 end
