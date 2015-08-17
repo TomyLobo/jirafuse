@@ -62,6 +62,10 @@ class JiraDir < RoutedDir
         @jira.raw_get(read_attachment(params)['content'])
     end
 
+    def get_attachment_body_size(params)
+        read_attachment(params)['size']
+    end
+
     def read_issue_title(params)
         read_issue(params)['fields']['description']
     end
@@ -78,5 +82,6 @@ class JiraDir < RoutedDir
           route_add :read, '/projects/:project/issues/:issue/attachments/:attachment.json', to: :read_attachment_json
           route_add :list, '/projects/:project/issues/:issue/attachments/:attachment', to: :list_attachment_body, constraints: { attachment: /[^\/.]+/ }
            route_add :read, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :read_attachment_body
+           route_add :size, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :get_attachment_body_size
          route_add :read, '/projects/:project/issues/:issue/title', to: :read_issue_title
 end
