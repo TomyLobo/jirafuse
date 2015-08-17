@@ -24,4 +24,8 @@ class RoutedDir
     def size(path)
         route_dispatch(:size, path) || read_file(path).length
     end
+
+    def times(path)
+        route_dispatch(:times, path) || FuseFS::FuseDir::INIT_TIMES
+    end
 end
