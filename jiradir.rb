@@ -21,7 +21,12 @@ class JiraDir < RoutedDir
     end
 
     def read_issue_comment(params)
-        @jira.get("/issue/#{params[:issue]}/comment/#{params[:comment]}")['body']
+        @jira.get("/issue/#{params[:issue]}/comment/#{params[:comment]}")
+    end
+
+    def read_issue_comment_body(params)
+        # return the value for the "body" key in the JSON object in the HTTP body
+        read_issue_comment(params)['body']
     end
 
     route_add :list, '/', to: [ 'projects' ]
@@ -30,5 +35,5 @@ class JiraDir < RoutedDir
        route_add :list, '/projects/:project/issues', to: :list_project_issues
         route_add :list, '/projects/:project/issues/:issue', to: [ 'comments' ]
          route_add :list, '/projects/:project/issues/:issue/comments', to: :list_issue_comments
-          route_add :read, '/projects/:project/issues/:issue/comments/:comment', to: :read_issue_comment
+          route_add :read, '/projects/:project/issues/:issue/comments/:comment', to: :read_issue_comment_body
 end
