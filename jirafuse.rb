@@ -2,12 +2,25 @@
 
 require 'rfusefs'
 require 'set'
+require './routing'
 
 class HelloDir
+    include Routing
+
+    def initialize
+        get '/issues', to: :testfunc
+        get '/issues/:id/comments', to: :testfunc
+    end
+
+    def testfunc(params)
+        "from testfunc: #{params}"
+    end
+
     @@files = Set.new [
         '/issues/:id/info',
         '/issues/:id/comments/1',
     ]
+
     @@directories = Set.new [
         '/issues',
         '/issues/:id/comments',
@@ -57,9 +70,11 @@ class HelloDir
     end
 
     def read_file(path)
-        "Hello, World!\n"
+        route_path(path)
     end
 end
 
+puts HelloDir.new.read_file('/issues/JFS-1/comments')
+
 # Usage: #{$0} mountpoint [mount_options]
-FuseFS.main() { |options| HelloDir.new }
+#FuseFS.main() { |options| HelloDir.new }
