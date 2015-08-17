@@ -3,6 +3,7 @@
 require 'rfusefs'
 require 'httparty'
 require 'pp'
+require 'deep_merge'
 
 class Jira
     include HTTParty
@@ -16,7 +17,7 @@ class Jira
     end
 
     def raw_get(path, options = {})
-        response = self.class.get(path, options.merge({
+        response = self.class.get(path, options.deep_merge({
             base_uri: @config['base_uri'],
             headers: {
                 'Accept' => 'application/json',
