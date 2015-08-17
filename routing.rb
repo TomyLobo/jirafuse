@@ -1,21 +1,28 @@
 #!/usr/bin/env ruby
 
-$routes = []
 
 module Routing
+    def self.included(base)
+        def base.route_add(verb, pattern, hash)
+            hash[:to] = instance_method(hash[:to]) if hash[:to].is_a? Symbol
+            @@routes ||= Hash.new { |h, k| h[k] = [] }
+            @@routes[verb] << Route.new(pattern, hash)
+        end
+    end
+
     class Route
         def initialize(pattern, hash)
             @hash = hash
             @keys = []
 
             # scan pattern for /:.../ (TODO: Regexp.escape the rest?)
-            pattern = pattern.gsub(/\/:([^\/]+)\//) {
+            pattern = pattern.gsub /\/:([^\/]+)/ do
                 # store matches in order
                 @keys << $1.to_sym
 
-                # replace by /([^/]*)/
-                '/([^/]*)/'
-            }
+                # replace by /([^/]*)
+                next '/([^/]*)'
+            end
             @regex = /^#{pattern}$/
         end
 
@@ -23,27 +30,40 @@ module Routing
             # match path
             match = @regex.match(path)
             return nil unless match
+
             # assign to params dict by order
-            Hash[@keys.zip(match.captures)]
+            return Hash[@keys.zip(match.captures)]
         end
 
-        def dispatch(path)
-            params = match(path)
-            return false unless params
+        def dispatch(instance, params)
+            to = @hash[:to]
 
-            @hash[:to].call params
+            return to.bind(instance).(params) if to.is_a? UnboundMethod
+
+            return to
         end
+        
+        def to_s
+            return "( #{@regex} => #{@hash} )"
+        end
+    end # Route
+
+    def route_dispatch(verb, path)
+        route, params = route_get(verb, path)
+        return route.dispatch(self, params) if route
+        return nil
     end
 
-    def get(pattern, hash)
-        hash[:to] = method(hash[:to])
-        $routes << Route.new(pattern, hash)
-    end
-
-    def route_path(path)
-        $routes.each do |route|
-            ret = route.dispatch(path)
-            return ret if ret
+    def route_get(verb, path)
+        @@routes[verb].each do |route|
+            params = route.match(path)
+            return [ route, params ] if params
         end
+        return nil
+    end
+    
+    def route_exists?(verb, path)
+        route, params = route_get(verb, path)
+        return !!route
     end
 end
