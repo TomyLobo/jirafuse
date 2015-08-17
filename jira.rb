@@ -12,8 +12,12 @@ class Jira
     end
 
     def get(path, options = {})
+        return raw_get("/rest/api/2#{path}", options)
+    end
+
+    def raw_get(path, options = {})
         response = self.class.get(path, options.merge({
-            base_uri: "#{@config['base_uri']}/rest/api/2",
+            base_uri: @config['base_uri'],
             headers: {
                 'Accept' => 'application/json',
                 'X-Atlassian-Token' => 'nocheck',
