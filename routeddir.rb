@@ -21,6 +21,14 @@ class RoutedDir
         route_dispatch :read, path
     end
 
+    def can_write?(path)
+        route_exists? :write, path
+    end
+
+    def write_to(path, contents)
+        route_dispatch :write, path, contents
+    end
+
     def size(path)
         route_dispatch(:size, path) || read_file(path).length
     end
