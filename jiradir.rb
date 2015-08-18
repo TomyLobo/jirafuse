@@ -23,7 +23,7 @@ class JiraDir < RoutedDir
 
     def list_issue_comments(params)
         comments = @jira.get("/issue/#{params[:issue]}/comment")['comments'].map { |entry| entry['id'] }
-        return comments.map { |id| id+'.txt' } + comments.map { |id| id+'.json' }
+        return comments.map { |id| id+'.txt' } + comments.map { |id| id+'.json' } + [ 'new' ]
     end
 
     def read_issue_comment(params)
@@ -46,6 +46,11 @@ class JiraDir < RoutedDir
         atime = mtime
 
         return [ atime, mtime, ctime ]
+    end
+
+    def add_comment(params, contents)
+        return if contents.empty?
+        @jira.post("/issue/#{params[:issue]}/comment", body: { 'body' => contents }.to_json)
     end
 
     def read_issue(params)
@@ -101,6 +106,8 @@ class JiraDir < RoutedDir
           route_add :times, '/projects/:project/issues/:issue/comments/:comment.txt', to: :get_issue_comment_times
           route_add :read, '/projects/:project/issues/:issue/comments/:comment.json', to: :read_issue_comment_json
           route_add :times, '/projects/:project/issues/:issue/comments/:comment.json', to: :get_issue_comment_times
+          route_add :read, '/projects/:project/issues/:issue/comments/new', to: ""
+          route_add :write, '/projects/:project/issues/:issue/comments/new', to: :add_comment
          route_add :list, '/projects/:project/issues/:issue/attachments', to: :list_issue_attachments
           route_add :read, '/projects/:project/issues/:issue/attachments/:attachment.json', to: :read_attachment_json
           route_add :times, '/projects/:project/issues/:issue/attachments/:attachment.json', to: :get_issue_attachment_times
