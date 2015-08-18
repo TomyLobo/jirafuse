@@ -40,10 +40,10 @@ module Routing
             return Hash[@keys.zip(match.captures)]
         end
 
-        def dispatch(instance, params)
+        def dispatch(instance, params, *args)
             to = @hash[:to]
 
-            return to.bind(instance).(params) if to.is_a? UnboundMethod
+            return to.bind(instance).(params, *args) if to.is_a? UnboundMethod
 
             return to
         end
@@ -53,9 +53,9 @@ module Routing
         end
     end # Route
 
-    def route_dispatch(verb, path)
+    def route_dispatch(verb, path, *args)
         route, params = route_get(verb, path)
-        return route.dispatch(self, params) if route
+        return route.dispatch(self, params, *args) if route
         return nil
     end
 
