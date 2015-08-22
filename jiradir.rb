@@ -18,7 +18,7 @@ class JiraDir < RoutedDir
     end
 
     def list_project_issues(params)
-        @jira.get("/search?fields=key&jql=project%3D#{params[:project]}")['issues'].map { |entry| entry['key'] }
+        @jira.get("/search?fields=key&jql=project%3D#{params[:project]}", max_age: 30)['issues'].map { |entry| entry['key'] }
     end
 
     def list_issue_comments(params)
