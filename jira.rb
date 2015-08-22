@@ -5,11 +5,14 @@ require 'httparty'
 require 'pp'
 require 'deep_merge'
 
+require './cache'
+
 class Jira
     include HTTParty
 
     def initialize
         @config = JSON.parse File.read 'config.json'
+        @cache = Cache.new
     end
 
     def get(path, options = {})
@@ -32,7 +35,7 @@ class Jira
             },
         })
 
-        response = self.class.get(path, options)
+        response = @cache.get(path, options[:max_age] || 10) { |path| self.class.get(path, options) }
 
         return response if (200..299).include?(response.code)
 
