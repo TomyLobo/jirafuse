@@ -100,7 +100,7 @@ class JiraDir < RoutedDir
      route_add :list, '/projects', to: :list_projects
       route_add :list, '/projects/:project', to: [ 'issues' ]
        route_add :list, '/projects/:project/issues', to: :list_project_issues
-        route_add :list, '/projects/:project/issues/:issue', to: [ 'comments', 'attachments', 'title' ]
+        route_add :list, '/projects/:project/issues/:issue', to: [ 'comments', 'attachments', 'metadata' ]
          route_add :list, '/projects/:project/issues/:issue/comments', to: :list_issue_comments
           route_add :read, '/projects/:project/issues/:issue/comments/:comment.txt', to: :read_issue_comment_body
           route_add :times, '/projects/:project/issues/:issue/comments/:comment.txt', to: :get_issue_comment_times
@@ -116,5 +116,6 @@ class JiraDir < RoutedDir
            route_add :read, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :read_attachment_body
            route_add :size, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :get_attachment_body_size
            route_add :times, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :get_issue_attachment_times
-         route_add :read, '/projects/:project/issues/:issue/title', to: :read_issue_title
+         route_add :list, '/projects/:project/issues/:issue/metadata', to: [ 'title' ]
+          route_add :read, '/projects/:project/issues/:issue/metadata/title', to: :read_issue_title
 end
