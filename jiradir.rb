@@ -14,7 +14,7 @@ class JiraDir < RoutedDir
     end
 
     def list_projects(params)
-        @jira.get('/project').map { |entry| entry['key'] }
+        @jira.get('/project', max_age: 1800).map { |entry| entry['key'] }
     end
 
     def list_project_issues(params)
