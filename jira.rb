@@ -21,7 +21,7 @@ class Jira
     end
 
     def raw_get(path, options = {})
-        response = self.class.get(path, options.deep_merge({
+        options = options.deep_merge({
             base_uri: @config['base_uri'],
             headers: {
                 'X-Atlassian-Token' => 'nocheck',
@@ -30,7 +30,9 @@ class Jira
                 username: @config['user'],
                 password: @config['password'],
             },
-        }))
+        })
+
+        response = self.class.get(path, options)
 
         return response if (200..299).include?(response.code)
 
