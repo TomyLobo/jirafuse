@@ -58,7 +58,7 @@ class JiraDir < RoutedDir
     end
 
     def read_issue(params)
-        @jira.get("/issue/#{params[:issue]}?fields=attachment,description")
+        @jira.get("/issue/#{params[:issue]}?fields=attachment,description,subtasks")
     end
 
     def list_issue_attachments(params)
@@ -100,11 +100,22 @@ class JiraDir < RoutedDir
         read_issue(params)['fields']['description']
     end
 
+    def list_issue_subtasks(params)
+        read_issue(params)['fields']['subtasks'].map { |subtask|
+            subtask['key']
+            #"#{subtask['outwardIssue']['key']}.#{subtask['type']['outward']}"
+        }
+    end
+
+    def read_issue_subtask(params)
+        "../../#{params[:subtask].split('.')[0]}"
+    end
+
     route_add :list, '/', to: [ 'projects' ]
      route_add :list, '/projects', to: :list_projects
       route_add :list, '/projects/:project', to: [ 'issues' ]
        route_add :list, '/projects/:project/issues', to: :list_project_issues
-        route_add :list, '/projects/:project/issues/:issue', to: [ 'comments', 'attachments', 'metadata' ]
+        route_add :list, '/projects/:project/issues/:issue', to: [ 'comments', 'attachments', 'metadata', 'subtasks' ]
          route_add :list, '/projects/:project/issues/:issue/comments', to: :list_issue_comments
           route_add :read, '/projects/:project/issues/:issue/comments/:comment.txt', to: :read_issue_comment_body
           route_add :times, '/projects/:project/issues/:issue/comments/:comment.txt', to: :get_issue_comment_times
@@ -122,4 +133,6 @@ class JiraDir < RoutedDir
            route_add :times, '/projects/:project/issues/:issue/attachments/:attachment/:filename', to: :get_issue_attachment_times
          route_add :list, '/projects/:project/issues/:issue/metadata', to: [ 'title' ]
           route_add :read, '/projects/:project/issues/:issue/metadata/title', to: :read_issue_title
+         route_add :list, '/projects/:project/issues/:issue/subtasks', to: :list_issue_subtasks
+          route_add :read, '/projects/:project/issues/:issue/subtasks/:subtask', to: :read_issue_subtask
 end
