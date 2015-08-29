@@ -37,8 +37,12 @@ class JiraDir < RoutedDir
         read_issue_comment(params)['body']
     end
 
+    def read_issue(params)
+        @jira.get("/issue/#{params[:issue]}?fields=attachment")
+    end
+
     def list_issue_attachments(params)
-        attachments = @jira.get("/issue/#{params[:issue]}?fields=attachment")['fields']['attachment'].map { |entry| entry['id'] }
+        attachments = read_issue(params)['fields']['attachment'].map { |entry| entry['id'] }
         return attachments + attachments.map { |id| id+'.json' }
     end
 
