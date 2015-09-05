@@ -13,31 +13,22 @@ module Routing
     class Route
         def initialize(pattern, hash)
             @hash = hash
-            @keys = []
 
             # scan pattern for /:.../ (TODO: Regexp.escape the rest?)
             pattern = pattern.gsub /\/:([a-z0-9_]+)/ do
                 sym = $1.to_sym
 
-                # store matches in order
-                @keys << sym
-
                 # determine constraint
                 constraint = @hash[:constraints].to_h[sym] || /[^\/]*/
 
                 # replace by constraint
-                next /\/(#{constraint})/
+                next /\/(?<#{$1}>#{constraint})/
             end
             @regex = /^#{pattern}$/
         end
 
         def match(path)
-            # match path
-            match = @regex.match(path)
-            return nil unless match
-
-            # assign to params dict by order
-            return Hash[@keys.zip(match.captures)]
+            return @regex.match(path)
         end
 
         def dispatch(instance, params, *args)
